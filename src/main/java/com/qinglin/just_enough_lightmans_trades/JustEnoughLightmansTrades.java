@@ -1,29 +1,57 @@
 package com.qinglin.just_enough_lightmans_trades;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
+import com.qinglin.just_enough_lightmans_trades.trades.PersistentTraderFile;
+import com.qinglin.just_enough_lightmans_trades.trades.TraderEntry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
+import java.nio.file.Path;
+
 @Mod(JustEnoughLightmansTrades.MOD_ID)
-public class JustEnoughLightmansTrades
-{
-    // Define mod id in a common place for everything to reference
-    public static final String MOD_ID = "just_enough_lightmans_trades";
+public class JustEnoughLightmansTrades {
 
+    public static final String MOD_ID = "jelc_trades";
 
+    public static final Logger LOGGER =
+            LogUtils.getLogger();
 
+    public JustEnoughLightmansTrades()
+    {
+        Path gameDir = FMLPaths.GAMEDIR.get();
 
+        LOGGER.info("GameDir = {}", gameDir);
+
+        PersistentTraderFile data =
+                PersistentTraderLoader.load(gameDir);
+
+        if(data == null)
+        {
+            LOGGER.info("PersistentTraders.json not found");
+            return;
+        }
+
+        LOGGER.info(
+                "Loaded {} traders",
+                data.Traders.size()
+        );
+
+        for(TraderEntry trader : data.Traders)
+        {
+            LOGGER.info(
+                    "Trader: {} ({})",
+                    trader.Name,
+                    trader.ID
+            );
+
+            if(trader.Trades != null)
+            {
+                LOGGER.info(
+                        "Trades: {}",
+                        trader.Trades.size()
+                );
+            }
+        }
+    }
 }
