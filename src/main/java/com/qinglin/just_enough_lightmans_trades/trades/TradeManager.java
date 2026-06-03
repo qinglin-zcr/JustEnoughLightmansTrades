@@ -1,22 +1,40 @@
 package com.qinglin.just_enough_lightmans_trades.trades;
 
-import java.util.ArrayList;
+import com.qinglin.just_enough_lightmans_trades.JustEnoughLightmansTrades;
+
+import java.util.Collections;
 import java.util.List;
 
-public final class TradeManager {
+public class TradeManager {
 
-    private static List<JELTTrade> trades =
-            new ArrayList<>();
+    private static PersistentTraderFile rawData;
 
-    private TradeManager() {}
+    private static List<JELTTrade> cachedTrades;
 
-    public static void setTrades(List<JELTTrade> newTrades)
+    public static void setRawData(PersistentTraderFile data)
     {
-        trades = new ArrayList<>(newTrades);
+        rawData = data;
+        cachedTrades = null;
     }
 
     public static List<JELTTrade> getTrades()
     {
-        return trades;
+        if(cachedTrades == null)
+        {
+            JustEnoughLightmansTrades.LOGGER.info(
+                    "Converting trader data..."
+            );
+
+            cachedTrades =
+                    JELTTradeConverter.convertAll(rawData);
+
+            JustEnoughLightmansTrades.LOGGER.info(
+                    "Converted {} trades",
+                    cachedTrades.size()
+            );
+        }
+
+        return cachedTrades;
     }
+
 }

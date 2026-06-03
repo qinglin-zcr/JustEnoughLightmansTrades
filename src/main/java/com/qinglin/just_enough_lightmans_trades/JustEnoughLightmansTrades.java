@@ -21,35 +21,21 @@ public class JustEnoughLightmansTrades {
     {
         Path gameDir = FMLPaths.GAMEDIR.get();
 
-        LOGGER.info("GameDir = {}", gameDir);
-
         PersistentTraderFile data =
                 PersistentTraderLoader.load(gameDir);
 
         if(data == null)
         {
-            LOGGER.info("PersistentTraders.json not found");
+            LOGGER.info(
+                    "PersistentTraders.json not found"
+            );
             return;
         }
 
-        List<JELTTrade> trades =
-                JELTTradeConverter.convertAll(data);
-        TradeManager.setTrades(trades);
+        TradeManager.setRawData(data);
 
         LOGGER.info(
-                "Loaded {} trades",
-                trades.size()
+                "Loaded PersistentTraders.json"
         );
-
-        for(JELTTrade trade : trades)
-        {
-            LOGGER.info(
-                    "{} {} inputs={} outputs={}",
-                    trade.getTraderName(),
-                    trade.getTradeType(),
-                    trade.getInputs().size(),
-                    trade.getOutputs().size()
-            );
-        }
     }
 }
