@@ -1,29 +1,55 @@
 package com.qinglin.just_enough_lightmans_trades;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
+import com.qinglin.just_enough_lightmans_trades.trades.*;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
+import java.nio.file.Path;
+import java.util.List;
+
 @Mod(JustEnoughLightmansTrades.MOD_ID)
-public class JustEnoughLightmansTrades
-{
-    // Define mod id in a common place for everything to reference
+public class JustEnoughLightmansTrades {
+
     public static final String MOD_ID = "just_enough_lightmans_trades";
 
+    public static final Logger LOGGER =
+            LogUtils.getLogger();
 
+    public JustEnoughLightmansTrades()
+    {
+        Path gameDir = FMLPaths.GAMEDIR.get();
 
+        LOGGER.info("GameDir = {}", gameDir);
 
+        PersistentTraderFile data =
+                PersistentTraderLoader.load(gameDir);
+
+        if(data == null)
+        {
+            LOGGER.info("PersistentTraders.json not found");
+            return;
+        }
+
+        List<JELTTrade> trades =
+                JELTTradeConverter.convertAll(data);
+        TradeManager.setTrades(trades);
+
+        LOGGER.info(
+                "Loaded {} trades",
+                trades.size()
+        );
+
+        for(JELTTrade trade : trades)
+        {
+            LOGGER.info(
+                    "{} {} inputs={} outputs={}",
+                    trade.getTraderName(),
+                    trade.getTradeType(),
+                    trade.getInputs().size(),
+                    trade.getOutputs().size()
+            );
+        }
+    }
 }
