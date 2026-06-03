@@ -1,6 +1,8 @@
 package com.qinglin.just_enough_lightmans_trades;
 
 import com.mojang.logging.LogUtils;
+import com.qinglin.just_enough_lightmans_trades.trades.JELTTrade;
+import com.qinglin.just_enough_lightmans_trades.trades.JELTTradeConverter;
 import com.qinglin.just_enough_lightmans_trades.trades.PersistentTraderFile;
 import com.qinglin.just_enough_lightmans_trades.trades.TraderEntry;
 import net.minecraftforge.fml.common.Mod;
@@ -8,11 +10,12 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
+import java.util.List;
 
 @Mod(JustEnoughLightmansTrades.MOD_ID)
 public class JustEnoughLightmansTrades {
 
-    public static final String MOD_ID = "jelc_trades";
+    public static final String MOD_ID = "just_enough_lightmans_trades";
 
     public static final Logger LOGGER =
             LogUtils.getLogger();
@@ -32,26 +35,24 @@ public class JustEnoughLightmansTrades {
             return;
         }
 
+        List<JELTTrade> trades =
+                JELTTradeConverter.convertAll(data);
+
         LOGGER.info(
-                "Loaded {} traders",
-                data.Traders.size()
+                "Loaded {} trades",
+                trades.size()
         );
 
-        for(TraderEntry trader : data.Traders)
+        for(JELTTrade trade : trades)
         {
             LOGGER.info(
-                    "Trader: {} ({})",
-                    trader.Name,
-                    trader.ID
+                    "Trader={} Type={} Item={} x{} PriceEntries={}",
+                    trade.getTraderName(),
+                    trade.getTradeType(),
+                    trade.getItem().getItem(),
+                    trade.getItem().getCount(),
+                    trade.getPrice().size()
             );
-
-            if(trader.Trades != null)
-            {
-                LOGGER.info(
-                        "Trades: {}",
-                        trader.Trades.size()
-                );
-            }
         }
     }
 }
