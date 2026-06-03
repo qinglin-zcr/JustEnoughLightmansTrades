@@ -15,32 +15,31 @@ public class JELTTradeConverter {
 
     private static ItemStack parseItem(ItemEntry entry)
     {
-        if(entry == null)
+        if (entry == null || entry.ID == null || entry.ID.isBlank())
             return ItemStack.EMPTY;
 
-        ResourceLocation key =
-                ResourceLocation.tryParse(entry.ID);
-
-        if(key == null)
+        ResourceLocation key = ResourceLocation.tryParse(entry.ID);
+        if (key == null)
             return ItemStack.EMPTY;
 
-        Item item =
-                BuiltInRegistries.ITEM.get(key);
+        Item item = BuiltInRegistries.ITEM.get(key);
+        if (item == null)
+            return ItemStack.EMPTY;
 
-        ItemStack stack =
-                new ItemStack(item, entry.Count);
+        int count = Math.max(1, entry.Count);
 
-        if(entry.Tag != null && !entry.Tag.isBlank())
+        ItemStack stack = new ItemStack(item, count);
+
+        if (entry.Tag != null && !entry.Tag.isBlank())
         {
             try
             {
-                CompoundTag tag =
-                        TagParser.parseTag(entry.Tag);
-
+                CompoundTag tag = TagParser.parseTag(entry.Tag);
                 stack.setTag(tag);
             }
-            catch(CommandSyntaxException ignored)
+            catch (CommandSyntaxException ignored)
             {
+                // ignore invalid NBT
             }
         }
 
@@ -51,24 +50,24 @@ public class JELTTradeConverter {
             TraderEntry trader,
             TradeEntry trade)
     {
-        List<ItemStack> inputs =
-                new ArrayList<>();
+        if (trader == null || trade == null || trade.TradeType == null)
+            return null;
 
-        List<ItemStack> outputs =
-                new ArrayList<>();
+        List<ItemStack> inputs = new ArrayList<>();
+        List<ItemStack> outputs = new ArrayList<>();
 
-        switch(trade.TradeType)
+        switch (trade.TradeType)
         {
-            case "SALE" -> {
-
-                if(trade.Price != null &&
-                        trade.Price.Value != null)
+            case "SALE" ->
+            {
+                if (trade.Price != null && trade.Price.Value != null)
                 {
-                    for(CoinEntry coin : trade.Price.Value)
+                    for (CoinEntry coin : trade.Price.Value)
                     {
-                        ItemEntry temp =
-                                new ItemEntry();
+                        if (coin == null || coin.Coin == null)
+                            continue;
 
+                        ItemEntry temp = new ItemEntry();
                         temp.ID = coin.Coin;
                         temp.Count = coin.Amount;
 
@@ -76,25 +75,23 @@ public class JELTTradeConverter {
                     }
                 }
 
-                outputs.add(
-                        parseItem(trade.SellItem)
-                );
+                if (trade.SellItem != null)
+                    outputs.add(parseItem(trade.SellItem));
             }
 
-            case "PURCHASE" -> {
+            case "PURCHASE" ->
+            {
+                if (trade.SellItem != null)
+                    inputs.add(parseItem(trade.SellItem));
 
-                inputs.add(
-                        parseItem(trade.SellItem)
-                );
-
-                if(trade.Price != null &&
-                        trade.Price.Value != null)
+                if (trade.Price != null && trade.Price.Value != null)
                 {
-                    for(CoinEntry coin : trade.Price.Value)
+                    for (CoinEntry coin : trade.Price.Value)
                     {
-                        ItemEntry temp =
-                                new ItemEntry();
+                        if (coin == null || coin.Coin == null)
+                            continue;
 
+                        ItemEntry temp = new ItemEntry();
                         temp.ID = coin.Coin;
                         temp.Count = coin.Amount;
 
@@ -103,53 +100,55 @@ public class JELTTradeConverter {
                 }
             }
 
-            case "BARTER" -> {
+            case "BARTER" ->
+            {
+                if (trade.BarterItem != null)
+                    inputs.add(parseItem(trade.BarterItem));
 
-                inputs.add(
-                        parseItem(trade.BarterItem)
-                );
-
-                outputs.add(
-                        parseItem(trade.SellItem)
-                );
+                if (trade.SellItem != null)
+                    outputs.add(parseItem(trade.SellItem));
             }
 
-            default -> {
+            default ->
+            {
                 return null;
             }
         }
 
         return new JELTTrade(
-                trader.ID,
-                trader.Name,
+                trader.ID != null ? trader.ID : "unknown",
+                trader.Name != null ? trader.Name : "unknown",
                 trade.TradeType,
                 inputs,
                 outputs
         );
     }
 
-    public static List<JELTTrade> convertAll(
-            PersistentTraderFile file)
+    public static List<JELTTrade> convertAll(PersistentTraderFile file)
     {
-        List<JELTTrade> result =
-                new ArrayList<>();
+        List<JELTTrade> result = new ArrayList<>();
 
-        if(file == null ||
-                file.Traders == null)
+        if (file == null || file.Traders == null)
             return result;
 
-        for(TraderEntry trader : file.Traders)
+        for (TraderEntry trader : file.Traders)
         {
-            if(trader.Trades == null)
+            if (trader == null || trader.Trades == null)
                 continue;
 
-            for(TradeEntry trade : trader.Trades)
+            for (TradeEntry trade : trader.Trades)
             {
-                JELTTrade converted =
-                        convert(trader, trade);
-
-                if(converted != null)
-                    result.add(converted);
+                try
+                {
+                    JELTTrade converted = convert(trader, trade);
+                    if (converted != null)
+                        result.add(converted);
+                }
+                catch (Exception e)
+                {
+                    // 防止单条坏数据炸整个 mod
+                    System.err.println("[JELT] Failed to convert trade: " + e.getMessage());
+                }
             }
         }
 
