@@ -8,4 +8,6 @@ public class TradeEntry {
 
     public PriceEntry Price;
 
+    public ItemEntry BarterItem;
+
 }

@@ -7,26 +7,27 @@ import java.util.List;
 public class JELTTrade {
 
     private final String traderId;
+
     private final String traderName;
 
     private final String tradeType;
 
-    private final ItemStack item;
+    private final List<ItemStack> inputs;
 
-    private final List<ItemStack> price;
+    private final List<ItemStack> outputs;
 
     public JELTTrade(
             String traderId,
             String traderName,
             String tradeType,
-            ItemStack item,
-            List<ItemStack> price)
+            List<ItemStack> inputs,
+            List<ItemStack> outputs)
     {
         this.traderId = traderId;
         this.traderName = traderName;
         this.tradeType = tradeType;
-        this.item = item;
-        this.price = price;
+        this.inputs = inputs;
+        this.outputs = outputs;
     }
 
     public String getTraderId() {
@@ -41,11 +42,11 @@ public class JELTTrade {
         return tradeType;
     }
 
-    public ItemStack getItem() {
-        return item;
+    public List<ItemStack> getInputs() {
+        return inputs;
     }
 
-    public List<ItemStack> getPrice() {
-        return price;
+    public List<ItemStack> getOutputs() {
+        return outputs;
     }
 }

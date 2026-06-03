@@ -1,6 +1,7 @@
 package com.qinglin.just_enough_lightmans_trades.jei;
 
 import com.qinglin.just_enough_lightmans_trades.JustEnoughLightmansTrades;
+import com.qinglin.just_enough_lightmans_trades.trades.TradeManager;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.resources.ResourceLocation;
@@ -23,10 +24,17 @@ public class JELTJeiPlugin implements IModPlugin {
     }
 
     @Override
-    public void registerRecipes(IRecipeRegistration registration)
+    public void registerRecipes(
+            IRecipeRegistration registration)
     {
+        registration.addRecipes(
+                JELTRecipeTypes.TRADES,
+                TradeManager.getTrades()
+        );
+
         JustEnoughLightmansTrades.LOGGER.info(
-                "JELT JEI Plugin Loaded"
+                "Registered {} JELT trades",
+                TradeManager.getTrades().size()
         );
     }
 

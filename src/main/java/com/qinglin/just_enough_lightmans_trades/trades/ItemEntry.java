@@ -6,4 +6,6 @@ public class ItemEntry {
 
     public int Count;
 
+    public String Tag;
+
 }

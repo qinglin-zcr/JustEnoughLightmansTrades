@@ -1,10 +1,7 @@
 package com.qinglin.just_enough_lightmans_trades;
 
 import com.mojang.logging.LogUtils;
-import com.qinglin.just_enough_lightmans_trades.trades.JELTTrade;
-import com.qinglin.just_enough_lightmans_trades.trades.JELTTradeConverter;
-import com.qinglin.just_enough_lightmans_trades.trades.PersistentTraderFile;
-import com.qinglin.just_enough_lightmans_trades.trades.TraderEntry;
+import com.qinglin.just_enough_lightmans_trades.trades.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
@@ -37,6 +34,7 @@ public class JustEnoughLightmansTrades {
 
         List<JELTTrade> trades =
                 JELTTradeConverter.convertAll(data);
+        TradeManager.setTrades(trades);
 
         LOGGER.info(
                 "Loaded {} trades",
@@ -46,12 +44,11 @@ public class JustEnoughLightmansTrades {
         for(JELTTrade trade : trades)
         {
             LOGGER.info(
-                    "Trader={} Type={} Item={} x{} PriceEntries={}",
+                    "{} {} inputs={} outputs={}",
                     trade.getTraderName(),
                     trade.getTradeType(),
-                    trade.getItem().getItem(),
-                    trade.getItem().getCount(),
-                    trade.getPrice().size()
+                    trade.getInputs().size(),
+                    trade.getOutputs().size()
             );
         }
     }
