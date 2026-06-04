@@ -8,10 +8,80 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class JELTTradeConverter {
+    private static List<ItemEntry> getItemSeries(
+            TradeEntry trade,
+            String prefix)
+    {
+        class IndexedItem
+        {
+            int index;
+            ItemEntry item;
+
+            IndexedItem(int index, ItemEntry item)
+            {
+                this.index = index;
+                this.item = item;
+            }
+        }
+
+        List<IndexedItem> temp = new ArrayList<>();
+
+        for(Field field : TradeEntry.class.getFields())
+        {
+            String name = field.getName();
+
+            if(!name.startsWith(prefix))
+                continue;
+
+            try
+            {
+                Object value = field.get(trade);
+
+                if(!(value instanceof ItemEntry item))
+                    continue;
+
+                String suffix =
+                        name.substring(prefix.length());
+
+                int index;
+
+                if(suffix.isEmpty())
+                {
+                    index = 1;
+                }
+                else
+                {
+                    index = Integer.parseInt(suffix);
+                }
+
+                temp.add(
+                        new IndexedItem(index, item)
+                );
+            }
+            catch(Exception ignored)
+            {
+            }
+        }
+
+        temp.sort(
+                Comparator.comparingInt(a -> a.index)
+        );
+
+        List<ItemEntry> result = new ArrayList<>();
+
+        for(IndexedItem entry : temp)
+        {
+            result.add(entry.item);
+        }
+
+        return result;
+    }
 
     private static ItemStack parseItem(ItemEntry entry)
     {
@@ -102,11 +172,23 @@ public class JELTTradeConverter {
 
             case "BARTER" ->
             {
-                if (trade.BarterItem != null)
-                    inputs.add(parseItem(trade.BarterItem));
+                for(ItemEntry item :
+                        getItemSeries(trade, "BarterItem"))
+                {
+                    ItemStack stack = parseItem(item);
 
-                if (trade.SellItem != null)
-                    outputs.add(parseItem(trade.SellItem));
+                    if(!stack.isEmpty())
+                        inputs.add(stack);
+                }
+
+                for(ItemEntry item :
+                        getItemSeries(trade, "SellItem"))
+                {
+                    ItemStack stack = parseItem(item);
+
+                    if(!stack.isEmpty())
+                        outputs.add(stack);
+                }
             }
 
             default ->
