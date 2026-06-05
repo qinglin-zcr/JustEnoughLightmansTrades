@@ -1,11 +1,10 @@
 package com.qinglin.just_enough_lightmans_trades.jei;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.qinglin.just_enough_lightmans_trades.trades.JELTTrade;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -14,27 +13,33 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.fluids.FluidStack;
 
-import java.util.List;
-
-public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
+public class JELTRecipeCategory
+        implements IRecipeCategory<JELTTrade>
+{
 
     private final IDrawable icon;
+
     private final IDrawableStatic arrow;
 
-    public JELTRecipeCategory(IGuiHelper guiHelper)
+    public JELTRecipeCategory(
+            IGuiHelper guiHelper)
     {
         this.icon =
                 guiHelper.createDrawableIngredient(
                         VanillaTypes.ITEM_STACK,
-                        new ItemStack(Items.EMERALD)
+                        new ItemStack(
+                                Items.EMERALD
+                        )
                 );
-        this.arrow = guiHelper.getRecipeArrow();
+
+        this.arrow =
+                guiHelper.getRecipeArrow();
     }
 
     @Override
@@ -46,7 +51,9 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
     @Override
     public Component getTitle()
     {
-        return Component.translatable("jei.just_enough_lightmans_trades.trades");
+        return Component.translatable(
+                "jei.just_enough_lightmans_trades.trades"
+        );
     }
 
     @Override
@@ -56,74 +63,172 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
     }
 
     @Override
-    public int getWidth() {
-        return 150; // 稍微加宽一点（原150），给中间的文本、箭头以及两边的多物品矩阵留出空间
+    public int getWidth()
+    {
+        return 170;
     }
 
     @Override
-    public int getHeight() {
-        return 60; // 稍微加高一点（原54），方便顶部容纳 Trader Name，下方留出两行物品的空间
+    public int getHeight()
+    {
+        return 78;
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, JELTTrade recipe, IFocusGroup focuses) {
-        int xStart = 5;
-        int yStart = 18;
+    public void setRecipe(
+            IRecipeLayoutBuilder builder,
+            JELTTrade recipe,
+            IFocusGroup focuses)
+    {
 
-        int perRow = 3;
+        final int leftX = 4;
+        final int rightX = 112;
+
+        final int startY = 28;
+
+        final int perRow = 3;
+
         int index = 0;
 
-        for (ItemStack input : recipe.getInputs())
+        /*
+         * Item Inputs
+         */
+        for(ItemStack stack :
+                recipe.getItemInputs())
         {
-            int x = xStart + (index % perRow) * 18;
-            int y = yStart + (index / perRow) * 18;
+            int x =
+                    leftX
+                            + (index % perRow) * 18;
 
-            builder.addSlot(RecipeIngredientRole.INPUT, x, y)
-                    .addItemStack(input);
+            int y =
+                    startY
+                            + (index / perRow) * 18;
+
+            builder.addSlot(
+                            RecipeIngredientRole.INPUT,
+                            x,
+                            y
+                    )
+                    .addItemStack(stack);
 
             index++;
         }
 
-        int outStartX = 95;
-        int outStartY = 18;
+        /*
+         * Fluid Inputs
+         */
+        for(FluidStack fluid :
+                recipe.getFluidInputs())
+        {
+            int x =
+                    leftX
+                            + (index % perRow) * 18;
+
+            int y =
+                    startY
+                            + (index / perRow) * 18;
+
+            builder.addSlot(
+                            RecipeIngredientRole.INPUT,
+                            x,
+                            y
+                    )
+                    .addIngredient(
+                            ForgeTypes.FLUID_STACK,
+                            fluid
+                    );
+
+            index++;
+        }
 
         int outIndex = 0;
 
-        for (ItemStack output : recipe.getOutputs())
+        /*
+         * Item Outputs
+         */
+        for(ItemStack stack :
+                recipe.getItemOutputs())
         {
-            int x = outStartX + (outIndex % perRow) * 18;
-            int y = outStartY + (outIndex / perRow) * 18;
+            int x =
+                    rightX
+                            + (outIndex % perRow) * 18;
 
-            builder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
-                    .addItemStack(output);
+            int y =
+                    startY
+                            + (outIndex / perRow) * 18;
+
+            builder.addSlot(
+                            RecipeIngredientRole.OUTPUT,
+                            x,
+                            y
+                    )
+                    .addItemStack(stack);
 
             outIndex++;
         }
 
-    }
+        /*
+         * Fluid Outputs
+         */
+        for(FluidStack fluid :
+                recipe.getFluidOutputs())
+        {
+            int x =
+                    rightX
+                            + (outIndex % perRow) * 18;
 
+            int y =
+                    startY
+                            + (outIndex / perRow) * 18;
+
+            builder.addSlot(
+                            RecipeIngredientRole.OUTPUT,
+                            x,
+                            y
+                    )
+                    .addIngredient(
+                            ForgeTypes.FLUID_STACK,
+                            fluid
+                    );
+
+            outIndex++;
+        }
+    }
 
     @Override
     public void draw(
             JELTTrade recipe,
             IRecipeSlotsView slotsView,
-            GuiGraphics guiGraphics,
+            GuiGraphics graphics,
             double mouseX,
             double mouseY)
     {
-        String text =
-                recipe.getTraderName();
 
-        guiGraphics.drawString(
-                Minecraft.getInstance().font,
-                text,
-                5,
+        Minecraft mc =
+                Minecraft.getInstance();
+
+        graphics.drawString(
+                mc.font,
+                recipe.getTraderName(),
+                4,
                 2,
                 0x404040,
                 false
         );
 
-        arrow.draw(guiGraphics, 70, 20);
-    }
+        graphics.drawString(
+                mc.font,
+                recipe.getOwnerName(),
+                4,
+                12,
+                0x808080,
+                false
+        );
 
+        arrow.draw(
+                graphics,
+                68,
+                36
+        );
+    }
 }

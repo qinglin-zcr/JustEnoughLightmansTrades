@@ -10,5 +10,4 @@ public class TraderEntry {
     public String OwnerName;
 
     public List<TradeEntry> Trades;
-
 }

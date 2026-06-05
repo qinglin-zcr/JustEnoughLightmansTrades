@@ -7,188 +7,229 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.registries.ForgeRegistries;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class JELTTradeConverter {
-    private static List<ItemEntry> getItemSeries(
-            TradeEntry trade,
-            String prefix)
-    {
-        class IndexedItem
-        {
-            int index;
-            ItemEntry item;
-
-            IndexedItem(int index, ItemEntry item)
-            {
-                this.index = index;
-                this.item = item;
-            }
-        }
-
-        List<IndexedItem> temp = new ArrayList<>();
-
-        for(Field field : TradeEntry.class.getFields())
-        {
-            String name = field.getName();
-
-            if(!name.startsWith(prefix))
-                continue;
-
-            try
-            {
-                Object value = field.get(trade);
-
-                if(!(value instanceof ItemEntry item))
-                    continue;
-
-                String suffix =
-                        name.substring(prefix.length());
-
-                int index;
-
-                if(suffix.isEmpty())
-                {
-                    index = 1;
-                }
-                else
-                {
-                    index = Integer.parseInt(suffix);
-                }
-
-                temp.add(
-                        new IndexedItem(index, item)
-                );
-            }
-            catch(Exception ignored)
-            {
-            }
-        }
-
-        temp.sort(
-                Comparator.comparingInt(a -> a.index)
-        );
-
-        List<ItemEntry> result = new ArrayList<>();
-
-        for(IndexedItem entry : temp)
-        {
-            result.add(entry.item);
-        }
-
-        return result;
-    }
 
     private static ItemStack parseItem(ItemEntry entry)
     {
-        if (entry == null || entry.ID == null || entry.ID.isBlank())
+        if(entry == null || entry.ID == null || entry.ID.isBlank())
             return ItemStack.EMPTY;
 
-        ResourceLocation key = ResourceLocation.tryParse(entry.ID);
-        if (key == null)
+        ResourceLocation key =
+                ResourceLocation.tryParse(entry.ID);
+
+        if(key == null)
             return ItemStack.EMPTY;
 
-        Item item = BuiltInRegistries.ITEM.get(key);
-        if (item == null)
+        Item item =
+                BuiltInRegistries.ITEM.get(key);
+
+        if(item == null)
             return ItemStack.EMPTY;
 
-        int count = Math.max(1, entry.Count);
+        ItemStack stack =
+                new ItemStack(
+                        item,
+                        Math.max(1, entry.Count)
+                );
 
-        ItemStack stack = new ItemStack(item, count);
-
-        if (entry.Tag != null && !entry.Tag.isBlank())
+        if(entry.Tag != null && !entry.Tag.isBlank())
         {
             try
             {
-                CompoundTag tag = TagParser.parseTag(entry.Tag);
+                CompoundTag tag =
+                        TagParser.parseTag(entry.Tag);
+
                 stack.setTag(tag);
             }
-            catch (CommandSyntaxException ignored)
+            catch(CommandSyntaxException ignored)
             {
-                // ignore invalid NBT
             }
         }
 
         return stack;
     }
 
+    private static FluidStack parseFluid(
+            ProductEntry product,
+            int quantity)
+    {
+        if(product == null || product.id == null)
+            return FluidStack.EMPTY;
+
+        ResourceLocation key =
+                ResourceLocation.tryParse(product.id);
+
+        if(key == null)
+            return FluidStack.EMPTY;
+
+        Fluid fluid =
+                ForgeRegistries.FLUIDS.getValue(key);
+
+        if(fluid == null)
+            return FluidStack.EMPTY;
+
+        return new FluidStack(
+                fluid,
+                Math.max(1, product.amount)
+                        * Math.max(1, quantity)
+        );
+    }
+
+    private static void addIfPresent(
+            List<ItemStack> list,
+            ItemEntry entry)
+    {
+        if(entry == null)
+            return;
+
+        ItemStack stack = parseItem(entry);
+
+        if(!stack.isEmpty())
+            list.add(stack);
+    }
+
+    private static void addPriceAsItems(
+            List<ItemStack> list,
+            PriceEntry price)
+    {
+        if(price == null || price.Value == null)
+            return;
+
+        for(CoinEntry coin : price.Value)
+        {
+            if(coin == null || coin.Coin == null)
+                continue;
+
+            ItemEntry temp = new ItemEntry();
+            temp.ID = coin.Coin;
+            temp.Count = coin.Amount;
+
+            ItemStack stack = parseItem(temp);
+
+            if(!stack.isEmpty())
+                list.add(stack);
+        }
+    }
+
     public static JELTTrade convert(
             TraderEntry trader,
             TradeEntry trade)
     {
-        if (trader == null || trade == null || trade.TradeType == null)
+        if(trader == null
+                || trade == null
+                || trade.TradeType == null)
+        {
             return null;
+        }
 
-        List<ItemStack> inputs = new ArrayList<>();
-        List<ItemStack> outputs = new ArrayList<>();
+        List<ItemStack> itemInputs =
+                new ArrayList<>();
 
-        switch (trade.TradeType)
+        List<ItemStack> itemOutputs =
+                new ArrayList<>();
+
+        List<FluidStack> fluidInputs =
+                new ArrayList<>();
+
+        List<FluidStack> fluidOutputs =
+                new ArrayList<>();
+
+        switch(trade.TradeType)
         {
             case "SALE" ->
             {
-                if (trade.Price != null && trade.Price.Value != null)
+                // 价格 -> 输入
+                addPriceAsItems(
+                        itemInputs,
+                        trade.Price
+                );
+
+                // 商品 -> 输出
+                addIfPresent(
+                        itemOutputs,
+                        trade.SellItem
+                );
+
+                addIfPresent(
+                        itemOutputs,
+                        trade.SellItem2
+                );
+
+                if(trade.Product != null)
                 {
-                    for (CoinEntry coin : trade.Price.Value)
-                    {
-                        if (coin == null || coin.Coin == null)
-                            continue;
+                    FluidStack fluid =
+                            parseFluid(
+                                    trade.Product,
+                                    trade.Quantity
+                            );
 
-                        ItemEntry temp = new ItemEntry();
-                        temp.ID = coin.Coin;
-                        temp.Count = coin.Amount;
-
-                        inputs.add(parseItem(temp));
-                    }
+                    if(!fluid.isEmpty())
+                        fluidOutputs.add(fluid);
                 }
-
-                if (trade.SellItem != null)
-                    outputs.add(parseItem(trade.SellItem));
             }
 
             case "PURCHASE" ->
             {
-                if (trade.SellItem != null)
-                    inputs.add(parseItem(trade.SellItem));
+                // 商品 -> 输入
+                addIfPresent(
+                        itemInputs,
+                        trade.SellItem
+                );
 
-                if (trade.Price != null && trade.Price.Value != null)
+                addIfPresent(
+                        itemInputs,
+                        trade.SellItem2
+                );
+
+                if(trade.Product != null)
                 {
-                    for (CoinEntry coin : trade.Price.Value)
-                    {
-                        if (coin == null || coin.Coin == null)
-                            continue;
+                    FluidStack fluid =
+                            parseFluid(
+                                    trade.Product,
+                                    trade.Quantity
+                            );
 
-                        ItemEntry temp = new ItemEntry();
-                        temp.ID = coin.Coin;
-                        temp.Count = coin.Amount;
-
-                        outputs.add(parseItem(temp));
-                    }
+                    if(!fluid.isEmpty())
+                        fluidInputs.add(fluid);
                 }
+
+                // 金币 -> 输出
+                addPriceAsItems(
+                        itemOutputs,
+                        trade.Price
+                );
             }
 
             case "BARTER" ->
             {
-                for(ItemEntry item :
-                        getItemSeries(trade, "BarterItem"))
-                {
-                    ItemStack stack = parseItem(item);
+                // 玩家提供
+                addIfPresent(
+                        itemInputs,
+                        trade.BarterItem
+                );
 
-                    if(!stack.isEmpty())
-                        inputs.add(stack);
-                }
+                addIfPresent(
+                        itemInputs,
+                        trade.BarterItem2
+                );
 
-                for(ItemEntry item :
-                        getItemSeries(trade, "SellItem"))
-                {
-                    ItemStack stack = parseItem(item);
+                // 玩家获得
+                addIfPresent(
+                        itemOutputs,
+                        trade.SellItem
+                );
 
-                    if(!stack.isEmpty())
-                        outputs.add(stack);
-                }
+                addIfPresent(
+                        itemOutputs,
+                        trade.SellItem2
+                );
             }
 
             default ->
@@ -198,38 +239,66 @@ public class JELTTradeConverter {
         }
 
         return new JELTTrade(
-                trader.ID != null ? trader.ID : "unknown",
-                trader.Name != null ? trader.Name : "unknown",
+                trader.ID != null
+                        ? trader.ID
+                        : "unknown",
+
+                trader.Name != null
+                        ? trader.Name
+                        : "unknown",
+
+                trader.OwnerName != null
+                        ? trader.OwnerName
+                        : "",
+
                 trade.TradeType,
-                inputs,
-                outputs
+
+                itemInputs,
+                itemOutputs,
+
+                fluidInputs,
+                fluidOutputs
         );
     }
 
-    public static List<JELTTrade> convertAll(PersistentTraderFile file)
+    public static List<JELTTrade> convertAll(
+            PersistentTraderFile file)
     {
-        List<JELTTrade> result = new ArrayList<>();
+        List<JELTTrade> result =
+                new ArrayList<>();
 
-        if (file == null || file.Traders == null)
-            return result;
-
-        for (TraderEntry trader : file.Traders)
+        if(file == null
+                || file.Traders == null)
         {
-            if (trader == null || trader.Trades == null)
-                continue;
+            return result;
+        }
 
-            for (TradeEntry trade : trader.Trades)
+        for(TraderEntry trader : file.Traders)
+        {
+            if(trader == null
+                    || trader.Trades == null)
+            {
+                continue;
+            }
+
+            for(TradeEntry trade : trader.Trades)
             {
                 try
                 {
-                    JELTTrade converted = convert(trader, trade);
-                    if (converted != null)
+                    JELTTrade converted =
+                            convert(trader, trade);
+
+                    if(converted != null)
+                    {
                         result.add(converted);
+                    }
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
-                    // 防止单条坏数据炸整个 mod
-                    System.err.println("[JELT] Failed to convert trade: " + e.getMessage());
+                    System.err.println(
+                            "[JELT] Failed to convert trade: "
+                                    + e.getMessage()
+                    );
                 }
             }
         }
