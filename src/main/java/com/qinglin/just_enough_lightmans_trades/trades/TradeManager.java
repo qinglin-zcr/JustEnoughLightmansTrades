@@ -2,7 +2,6 @@ package com.qinglin.just_enough_lightmans_trades.trades;
 
 import com.qinglin.just_enough_lightmans_trades.JustEnoughLightmansTrades;
 
-import java.util.Collections;
 import java.util.List;
 
 public class TradeManager {

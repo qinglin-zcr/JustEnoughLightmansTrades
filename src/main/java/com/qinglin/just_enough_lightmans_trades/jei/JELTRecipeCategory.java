@@ -65,13 +65,13 @@ public class JELTRecipeCategory
     @Override
     public int getWidth()
     {
-        return 170;
+        return 150;
     }
 
     @Override
     public int getHeight()
     {
-        return 78;
+        return 60;
     }
 
     @Override

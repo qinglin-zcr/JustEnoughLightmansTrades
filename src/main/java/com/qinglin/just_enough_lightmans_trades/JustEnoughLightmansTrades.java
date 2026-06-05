@@ -7,7 +7,6 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
-import java.util.List;
 
 @Mod(JustEnoughLightmansTrades.MOD_ID)
 public class JustEnoughLightmansTrades {
