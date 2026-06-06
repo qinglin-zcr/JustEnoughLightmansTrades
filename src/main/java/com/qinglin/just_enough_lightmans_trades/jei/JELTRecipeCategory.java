@@ -3,7 +3,6 @@ package com.qinglin.just_enough_lightmans_trades.jei;
 import com.qinglin.just_enough_lightmans_trades.trades.JELTTrade;
 import io.github.lightman314.lightmanscurrency.common.core.ModItems;
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
@@ -17,7 +16,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraftforge.fluids.FluidStack;
 
 public class JELTRecipeCategory
