@@ -132,6 +132,6 @@ public class JELTRecipeCategory
                 false
         );
 
-        arrow.draw(graphics, 66, 30);
+        arrow.draw(graphics, 64, 32);
     }
 }
