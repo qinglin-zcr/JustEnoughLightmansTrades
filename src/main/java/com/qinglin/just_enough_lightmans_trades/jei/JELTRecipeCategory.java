@@ -78,118 +78,29 @@ public class JELTRecipeCategory
             JELTTrade recipe,
             IFocusGroup focuses)
     {
-
-        final int leftX = 4;
-        final int rightX = 112;
-
-        final int startY = 28;
-
-        final int perRow = 3;
-
-        int index = 0;
-
-        /*
-         * Item Inputs
-         */
-        for(ItemStack stack :
-                recipe.getItemInputs())
-        {
-            int x =
-                    leftX
-                            + (index % perRow) * 18;
-
-            int y =
-                    startY
-                            + (index / perRow) * 18;
-
-            builder.addSlot(
-                            RecipeIngredientRole.INPUT,
-                            x,
-                            y
-                    )
-                    .addItemStack(stack);
-
-            index++;
+        final int lx=5,rx=91,sy=18;int idx=0;
+        for(ItemStack stack:recipe.getItemInputs()){
+            int x=lx+(idx%3)*18,y=sy+(idx/3)*18;
+            builder.addSlot(RecipeIngredientRole.INPUT,x,y).addItemStack(stack);
+            idx++;
         }
-
-        /*
-         * Fluid Inputs
-         */
-        for(FluidStack fluid :
-                recipe.getFluidInputs())
-        {
-            int x =
-                    leftX
-                            + (index % perRow) * 18;
-
-            int y =
-                    startY
-                            + (index / perRow) * 18;
-
-            builder.addSlot(
-                            RecipeIngredientRole.INPUT,
-                            x,
-                            y
-                    )
-                    .addIngredient(
-                            ForgeTypes.FLUID_STACK,
-                            fluid
-                    );
-
-            index++;
+        for(FluidStack fluid:recipe.getFluidInputs()){
+            int x=lx+(idx%3)*18,y=sy+(idx/3)*18;
+            builder.addSlot(RecipeIngredientRole.INPUT,x,y)
+                    .addFluidStack(fluid.getFluid(),fluid.getAmount());
+            idx++;
         }
-
-        int outIndex = 0;
-
-        /*
-         * Item Outputs
-         */
-        for(ItemStack stack :
-                recipe.getItemOutputs())
-        {
-            int x =
-                    rightX
-                            + (outIndex % perRow) * 18;
-
-            int y =
-                    startY
-                            + (outIndex / perRow) * 18;
-
-            builder.addSlot(
-                            RecipeIngredientRole.OUTPUT,
-                            x,
-                            y
-                    )
-                    .addItemStack(stack);
-
-            outIndex++;
+        idx=0;
+        for(ItemStack stack:recipe.getItemOutputs()){
+            int x=rx+(idx%3)*18,y=sy+(idx/3)*18;
+            builder.addSlot(RecipeIngredientRole.OUTPUT,x,y).addItemStack(stack);
+            idx++;
         }
-
-        /*
-         * Fluid Outputs
-         */
-        for(FluidStack fluid :
-                recipe.getFluidOutputs())
-        {
-            int x =
-                    rightX
-                            + (outIndex % perRow) * 18;
-
-            int y =
-                    startY
-                            + (outIndex / perRow) * 18;
-
-            builder.addSlot(
-                            RecipeIngredientRole.OUTPUT,
-                            x,
-                            y
-                    )
-                    .addIngredient(
-                            ForgeTypes.FLUID_STACK,
-                            fluid
-                    );
-
-            outIndex++;
+        for(FluidStack fluid:recipe.getFluidOutputs()){
+            int x=rx+(idx%3)*18,y=sy+(idx/3)*18;
+            builder.addSlot(RecipeIngredientRole.OUTPUT,x,y)
+                    .addFluidStack(fluid.getFluid(),fluid.getAmount());
+            idx++;
         }
     }
 
@@ -223,10 +134,6 @@ public class JELTRecipeCategory
                 false
         );
 
-        arrow.draw(
-                graphics,
-                68,
-                36
-        );
+        arrow.draw(graphics, 75, 30);
     }
 }

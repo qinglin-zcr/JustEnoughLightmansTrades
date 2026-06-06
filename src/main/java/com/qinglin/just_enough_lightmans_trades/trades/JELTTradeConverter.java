@@ -145,13 +145,11 @@ public class JELTTradeConverter {
         {
             case "SALE" ->
             {
-                // 价格 -> 输入
                 addPriceAsItems(
                         itemInputs,
                         trade.Price
                 );
 
-                // 商品 -> 输出
                 addIfPresent(
                         itemOutputs,
                         trade.SellItem
@@ -177,7 +175,6 @@ public class JELTTradeConverter {
 
             case "PURCHASE" ->
             {
-                // 商品 -> 输入
                 addIfPresent(
                         itemInputs,
                         trade.SellItem
@@ -200,7 +197,6 @@ public class JELTTradeConverter {
                         fluidInputs.add(fluid);
                 }
 
-                // 金币 -> 输出
                 addPriceAsItems(
                         itemOutputs,
                         trade.Price
@@ -209,7 +205,7 @@ public class JELTTradeConverter {
 
             case "BARTER" ->
             {
-                // 玩家提供
+
                 addIfPresent(
                         itemInputs,
                         trade.BarterItem
@@ -220,7 +216,6 @@ public class JELTTradeConverter {
                         trade.BarterItem2
                 );
 
-                // 玩家获得
                 addIfPresent(
                         itemOutputs,
                         trade.SellItem
