@@ -33,7 +33,7 @@ public class JELTRecipeCategory
     {
         this.icon = guiHelper.createDrawableIngredient(
                 VanillaTypes.ITEM_STACK,
-                new ItemStack(ModItems.PORTABLE_TERMINAL.get())
+                new ItemStack(ModItems.TRADING_CORE.get())
         );
 
         this.arrow =
