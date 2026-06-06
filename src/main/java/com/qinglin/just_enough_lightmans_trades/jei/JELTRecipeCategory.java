@@ -18,64 +18,41 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
-public class JELTRecipeCategory
-        implements IRecipeCategory<JELTTrade>
-{
+public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
 
     private final IDrawable icon;
 
     private final IDrawableStatic arrow;
 
-    public JELTRecipeCategory(
-            IGuiHelper guiHelper)
-    {
+    public JELTRecipeCategory(IGuiHelper guiHelper){
         this.icon = guiHelper.createDrawableIngredient(
                 VanillaTypes.ITEM_STACK,
                 new ItemStack(ModItems.TRADING_CORE.get())
         );
 
-        this.arrow =
-                guiHelper.getRecipeArrow();
+        this.arrow = guiHelper.getRecipeArrow();
     }
 
     @Override
-    public RecipeType<JELTTrade> getRecipeType()
-    {
-        return JELTRecipeTypes.TRADES;
-    }
+    public RecipeType<JELTTrade> getRecipeType() {return JELTRecipeTypes.TRADES;}
 
     @Override
-    public Component getTitle()
-    {
+    public Component getTitle() {
         return Component.translatable(
-                "jei.just_enough_lightmans_trades.trades"
-        );
+                "jei.just_enough_lightmans_trades.trades");
     }
 
     @Override
-    public IDrawable getIcon()
-    {
-        return icon;
-    }
+    public IDrawable getIcon() {return icon;}
 
     @Override
-    public int getWidth()
-    {
-        return 150;
-    }
+    public int getWidth() {return 150;}
 
     @Override
-    public int getHeight()
-    {
-        return 60;
-    }
+    public int getHeight() {return 60;}
 
     @Override
-    public void setRecipe(
-            IRecipeLayoutBuilder builder,
-            JELTTrade recipe,
-            IFocusGroup focuses)
-    {
+    public void setRecipe(IRecipeLayoutBuilder builder,JELTTrade recipe,IFocusGroup focuses) {
         final int lx=4,rx=90,sy=24;int idx=0;
         for(ItemStack stack:recipe.getItemInputs()){
             int x=lx+(idx%3)*18,y=sy+(idx/3)*18;
