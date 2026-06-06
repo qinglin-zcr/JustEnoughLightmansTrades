@@ -76,7 +76,7 @@ public class JELTRecipeCategory
             JELTTrade recipe,
             IFocusGroup focuses)
     {
-        final int lx=5,rx=91,sy=18;int idx=0;
+        final int lx=4,rx=90,sy=24;int idx=0;
         for(ItemStack stack:recipe.getItemInputs()){
             int x=lx+(idx%3)*18,y=sy+(idx/3)*18;
             builder.addSlot(RecipeIngredientRole.INPUT,x,y).addItemStack(stack);
@@ -132,6 +132,6 @@ public class JELTRecipeCategory
                 false
         );
 
-        arrow.draw(graphics, 75, 30);
+        arrow.draw(graphics, 66, 30);
     }
 }

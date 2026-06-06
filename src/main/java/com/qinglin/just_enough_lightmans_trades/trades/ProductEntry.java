@@ -6,4 +6,6 @@ public class ProductEntry {
 
     public int amount;
 
+    public String tag;
+
 }

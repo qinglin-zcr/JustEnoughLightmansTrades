@@ -76,9 +76,7 @@ public class JELTTradeConverter {
             return FluidStack.EMPTY;
 
         return new FluidStack(
-                fluid,
-                Math.max(1, product.amount)
-                        * Math.max(1, quantity)
+                fluid,product.amount*quantity
         );
     }
 
