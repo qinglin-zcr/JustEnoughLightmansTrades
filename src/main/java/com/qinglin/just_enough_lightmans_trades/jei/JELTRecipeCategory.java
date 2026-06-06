@@ -1,6 +1,7 @@
 package com.qinglin.just_enough_lightmans_trades.jei;
 
 import com.qinglin.just_enough_lightmans_trades.trades.JELTTrade;
+import io.github.lightman314.lightmanscurrency.common.core.ModItems;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -30,13 +31,10 @@ public class JELTRecipeCategory
     public JELTRecipeCategory(
             IGuiHelper guiHelper)
     {
-        this.icon =
-                guiHelper.createDrawableIngredient(
-                        VanillaTypes.ITEM_STACK,
-                        new ItemStack(
-                                Items.EMERALD
-                        )
-                );
+        this.icon = guiHelper.createDrawableIngredient(
+                VanillaTypes.ITEM_STACK,
+                new ItemStack(ModItems.PORTABLE_TERMINAL.get())
+        );
 
         this.arrow =
                 guiHelper.getRecipeArrow();
