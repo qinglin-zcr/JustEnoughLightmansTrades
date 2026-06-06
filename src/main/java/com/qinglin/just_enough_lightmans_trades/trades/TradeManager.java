@@ -7,25 +7,17 @@ import java.util.List;
 public class TradeManager {
 
     private static PersistentTraderFile rawData;
-
     private static List<JELTTrade> cachedTrades;
-
-    public static void setRawData(PersistentTraderFile data)
-    {
+    public static void setRawData(PersistentTraderFile data) {
         rawData = data;
         cachedTrades = null;
     }
 
-    public static List<JELTTrade> getTrades()
-    {
-        if(cachedTrades == null)
-        {
-            JustEnoughLightmansTrades.LOGGER.info(
-                    "Converting trader data..."
-            );
+    public static List<JELTTrade> getTrades() {
+        if(cachedTrades == null) {
+            JustEnoughLightmansTrades.LOGGER.info("Converting trader data...");
 
-            cachedTrades =
-                    JELTTradeConverter.convertAll(rawData);
+            cachedTrades = JELTTradeConverter.convertAll(rawData);
 
             JustEnoughLightmansTrades.LOGGER.info(
                     "Converted {} trades",

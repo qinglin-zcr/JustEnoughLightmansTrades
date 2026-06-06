@@ -13,28 +13,16 @@ public class JustEnoughLightmansTrades {
 
     public static final String MOD_ID = "just_enough_lightmans_trades";
 
-    public static final Logger LOGGER =
-            LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
-    public JustEnoughLightmansTrades()
-    {
+    public JustEnoughLightmansTrades() {
         Path gameDir = FMLPaths.GAMEDIR.get();
-
-        PersistentTraderFile data =
-                PersistentTraderLoader.load(gameDir);
-
-        if(data == null)
-        {
-            LOGGER.info(
-                    "PersistentTraders.json not found"
-            );
+        PersistentTraderFile data = PersistentTraderLoader.load(gameDir);
+        if(data == null) {
+            LOGGER.info("PersistentTraders.json not found");
             return;
         }
-
         TradeManager.setRawData(data);
-
-        LOGGER.info(
-                "Loaded PersistentTraders.json"
-        );
+        LOGGER.info("Loaded PersistentTraders.json");
     }
 }
