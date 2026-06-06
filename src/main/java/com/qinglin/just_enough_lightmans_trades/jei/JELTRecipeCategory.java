@@ -12,6 +12,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -77,7 +78,10 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
         for(FluidStack fluid:recipe.getFluidOutputs()){
             int x=rx+(idx%3)*18,y=sy+(idx/3)*18;
             builder.addSlot(RecipeIngredientRole.OUTPUT,x,y)
-                    .addFluidStack(fluid.getFluid(),fluid.getAmount(),fluid.getTag());
+                    .addFluidStack(fluid.getFluid(),fluid.getAmount(),fluid.getTag())
+                    .addRichTooltipCallback((recipeSlotView, tooltip) -> {
+                        tooltip.add(Component.literal(fluid.getAmount()+" mB").withStyle(net.minecraft.ChatFormatting.GRAY));
+                    });
             idx++;
         }
     }
