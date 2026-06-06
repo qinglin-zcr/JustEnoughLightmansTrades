@@ -62,7 +62,10 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
         for(FluidStack fluid:recipe.getFluidInputs()){
             int x=lx+(idx%3)*18,y=sy+(idx/3)*18;
             builder.addSlot(RecipeIngredientRole.INPUT,x,y)
-                    .addFluidStack(fluid.getFluid(),fluid.getAmount());
+                    .addFluidStack(fluid.getFluid(),fluid.getAmount(),fluid.getTag())
+                    .addRichTooltipCallback((recipeSlotView, tooltip) -> {
+                        tooltip.add(Component.literal(fluid.getAmount() + " mB").withStyle(net.minecraft.ChatFormatting.GRAY));
+                    });
             idx++;
         }
         idx=0;
@@ -74,7 +77,7 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
         for(FluidStack fluid:recipe.getFluidOutputs()){
             int x=rx+(idx%3)*18,y=sy+(idx/3)*18;
             builder.addSlot(RecipeIngredientRole.OUTPUT,x,y)
-                    .addFluidStack(fluid.getFluid(),fluid.getAmount());
+                    .addFluidStack(fluid.getFluid(),fluid.getAmount(),fluid.getTag());
             idx++;
         }
     }
