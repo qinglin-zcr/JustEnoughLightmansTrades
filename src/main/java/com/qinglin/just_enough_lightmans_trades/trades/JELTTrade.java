@@ -8,18 +8,14 @@ import java.util.List;
 public class JELTTrade {
 
     private final String traderId;
-
     private final String traderName;
-
     private final String traderOwnerName;
-
     private final String tradeType;
-
     private final List<ItemStack> itemInputs;
     private final List<ItemStack> itemOutputs;
-
     private final List<FluidStack> fluidInputs;
     private final List<FluidStack> fluidOutputs;
+    private final int Quantity;
 
     public JELTTrade(
             String traderId,
@@ -29,17 +25,17 @@ public class JELTTrade {
             List<ItemStack> itemInputs,
             List<ItemStack> itemOutputs,
             List<FluidStack> fluidInputs,
-            List<FluidStack> fluidOutputs) {
+            List<FluidStack> fluidOutputs,
+            int Quantity) {
         this.traderId = traderId;
         this.traderName = traderName;
         this.traderOwnerName = traderOwnerName;
         this.tradeType = tradeType;
-
         this.itemInputs = itemInputs;
         this.itemOutputs = itemOutputs;
-
         this.fluidInputs = fluidInputs;
         this.fluidOutputs = fluidOutputs;
+        this.Quantity= Quantity;
     }
 
     public String getTraderId() {
@@ -52,9 +48,9 @@ public class JELTTrade {
     public String getTradeType() {
         return tradeType;
     }
-
     public List<ItemStack> getItemInputs() {return itemInputs;}
     public List<ItemStack> getItemOutputs() {return itemOutputs;}
     public List<FluidStack> getFluidInputs() {return fluidInputs;}
     public List<FluidStack> getFluidOutputs() {return fluidOutputs;}
+    public int getQuantity(){return Quantity;}
 }

@@ -14,5 +14,5 @@ public class TradeEntry {
 
     public ProductEntry Product;
 
-    public int Quantity;
+    public int Quantity=-1;
 }

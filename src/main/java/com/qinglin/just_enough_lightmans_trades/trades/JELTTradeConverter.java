@@ -87,6 +87,7 @@ public class JELTTradeConverter {
         List<ItemStack> itemOutputs = new ArrayList<>();
         List<FluidStack> fluidInputs = new ArrayList<>();
         List<FluidStack> fluidOutputs = new ArrayList<>();
+        int quantity=-1;
 
         switch(trade.TradeType) {
             case "SALE" -> {
@@ -94,12 +95,16 @@ public class JELTTradeConverter {
                 addIfPresent(itemOutputs, trade.SellItem);
                 addIfPresent(itemOutputs, trade.SellItem2);
                 addIfPresent(fluidOutputs,trade.Product,trade.Quantity);
+                if(trade.SellItem==null&&trade.SellItem2==null&&trade.Product==null)
+                    if(trade.Quantity!=-1)quantity=trade.Quantity;
             }
             case "PURCHASE" -> {
                 addIfPresent(itemInputs, trade.SellItem);
                 addIfPresent(itemInputs, trade.SellItem2);
                 addIfPresent(fluidInputs,trade.Product,trade.Quantity);
                 addPriceAsItems(itemOutputs, trade.Price);
+                if(trade.SellItem==null&&trade.SellItem2==null&&trade.Product==null)
+                    if(trade.Quantity!=-1)quantity=trade.Quantity;
             }
             case "BARTER" -> {
                 addIfPresent(itemInputs, trade.BarterItem);
@@ -116,7 +121,8 @@ public class JELTTradeConverter {
                 trader.OwnerName != null ? trader.OwnerName : "",
                 trade.TradeType,
                 itemInputs, itemOutputs,
-                fluidInputs, fluidOutputs
+                fluidInputs, fluidOutputs,
+                quantity
         );
     }
 

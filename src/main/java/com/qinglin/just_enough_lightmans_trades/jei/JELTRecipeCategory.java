@@ -97,6 +97,25 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
             idx++;
         }
 
+        if(recipe.getItemInputs().isEmpty()&&recipe.getFluidInputs().isEmpty()
+                &&recipe.getQuantity()!=-1){
+            String tx = recipe.getQuantity() + "FE";
+            int w = mc.font.width(tx);
+            graphics.drawString(
+                    mc.font,tx,31-(w/2),40-mc.font.lineHeight/2,
+                    0xFFFFFF,true
+            );
+        }
+        if(recipe.getItemOutputs().isEmpty()&&recipe.getFluidOutputs().isEmpty()
+                &&recipe.getQuantity()!=-1){
+            String tx = recipe.getQuantity() + " FE";
+            int w = mc.font.width(tx);
+            graphics.drawString(
+                    mc.font,tx,117-(w/2),40-mc.font.lineHeight/2,
+                    0xFFFFFF,true
+            );
+        }
+
         graphics.drawString(
                 mc.font,
                 recipe.getTraderName(),
@@ -131,13 +150,15 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
         PoseStack pose = graphics.pose();
         pose.pushPose();
         pose.translate(0, 0, 200);
-        pose.scale(0.5F, 0.5F, 1.0F);
+        final float scale=0.625F;
+        final float inv=1.6F;
+        pose.scale(scale, scale, 1.0F);
         int textWidth = mc.font.width(text);
         graphics.drawString(
                 mc.font,
                 text,
-                x * 2 + 32 - textWidth,
-                y * 2 + 24,
+                Math.round(x * inv + 16 * inv - textWidth),
+                Math.round(y * inv + 12 * inv),
                 0xFFFFFF,
                 true
         );
