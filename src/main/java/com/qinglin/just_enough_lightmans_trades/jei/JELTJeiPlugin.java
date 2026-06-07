@@ -78,8 +78,5 @@ public class JELTJeiPlugin implements IModPlugin {
                 JELTRecipeTypes.TRADES
         );
 
-
-
-
     }
 }

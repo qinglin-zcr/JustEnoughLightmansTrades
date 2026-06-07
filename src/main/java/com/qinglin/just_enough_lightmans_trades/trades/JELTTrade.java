@@ -29,8 +29,7 @@ public class JELTTrade {
             List<ItemStack> itemInputs,
             List<ItemStack> itemOutputs,
             List<FluidStack> fluidInputs,
-            List<FluidStack> fluidOutputs)
-    {
+            List<FluidStack> fluidOutputs) {
         this.traderId = traderId;
         this.traderName = traderName;
         this.traderOwnerName = traderOwnerName;
@@ -46,34 +45,16 @@ public class JELTTrade {
     public String getTraderId() {
         return traderId;
     }
-
     public String getTraderName() {
         return traderName;
     }
-
     public String getOwnerName() {return traderOwnerName;}
-
     public String getTradeType() {
         return tradeType;
     }
 
-    public List<ItemStack> getItemInputs()
-    {
-        return itemInputs;
-    }
-
-    public List<ItemStack> getItemOutputs()
-    {
-        return itemOutputs;
-    }
-
-    public List<FluidStack> getFluidInputs()
-    {
-        return fluidInputs;
-    }
-
-    public List<FluidStack> getFluidOutputs()
-    {
-        return fluidOutputs;
-    }
+    public List<ItemStack> getItemInputs() {return itemInputs;}
+    public List<ItemStack> getItemOutputs() {return itemOutputs;}
+    public List<FluidStack> getFluidInputs() {return fluidInputs;}
+    public List<FluidStack> getFluidOutputs() {return fluidOutputs;}
 }
