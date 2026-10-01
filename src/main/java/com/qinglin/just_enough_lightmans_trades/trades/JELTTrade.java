@@ -16,6 +16,7 @@ public class JELTTrade {
     private final List<FluidStack> fluidInputs;
     private final List<FluidStack> fluidOutputs;
     private final int Quantity;
+    private final int tradeIndex;
 
     public JELTTrade(
             String traderId,
@@ -27,6 +28,21 @@ public class JELTTrade {
             List<FluidStack> fluidInputs,
             List<FluidStack> fluidOutputs,
             int Quantity) {
+        this(traderId, traderName, traderOwnerName, tradeType, itemInputs, itemOutputs,
+                fluidInputs, fluidOutputs, Quantity, -1);
+    }
+
+    public JELTTrade(
+            String traderId,
+            String traderName,
+            String traderOwnerName,
+            String tradeType,
+            List<ItemStack> itemInputs,
+            List<ItemStack> itemOutputs,
+            List<FluidStack> fluidInputs,
+            List<FluidStack> fluidOutputs,
+            int Quantity,
+            int tradeIndex) {
         this.traderId = traderId;
         this.traderName = traderName;
         this.traderOwnerName = traderOwnerName;
@@ -36,6 +52,7 @@ public class JELTTrade {
         this.fluidInputs = fluidInputs;
         this.fluidOutputs = fluidOutputs;
         this.Quantity= Quantity;
+        this.tradeIndex = tradeIndex;
     }
 
     public String getTraderId() {
@@ -53,4 +70,5 @@ public class JELTTrade {
     public List<FluidStack> getFluidInputs() {return fluidInputs;}
     public List<FluidStack> getFluidOutputs() {return fluidOutputs;}
     public int getQuantity(){return Quantity;}
+    public int getTradeIndex() {return tradeIndex;}
 }

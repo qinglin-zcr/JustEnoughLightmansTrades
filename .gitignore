@@ -1,25 +1,34 @@
-# eclipse
-bin
-*.launch
-.settings
-.metadata
-.classpath
-.project
+# Gradle
+.gradle/
+build/
+out/
 
-# idea
-out
+# Java build output
+bin/
+*.class
+
+# Minecraft/Forge local run data
+run/
+logs/
+crash-reports/
+saves/
+*.log
+
+# IDE/editor files
+.idea/
+.vscode/
+*.iml
 *.ipr
 *.iws
-*.iml
-.idea
 
-# gradle
-build
-.gradle
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# other
-eclipse
-run
-
-# Files from Forge MDK
-forge*changelog.txt
+# Local temp/work files
+.codex-tmp/
+.agents/
+.codegraph/
+*.tmp
+*.temp
