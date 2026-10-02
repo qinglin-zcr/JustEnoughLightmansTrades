@@ -81,6 +81,10 @@ public class JELTTradeConverter {
     }
 
     public static JELTTrade convert(TraderEntry trader, TradeEntry trade) {
+        return convert(trader, trade, -1);
+    }
+
+    public static JELTTrade convert(TraderEntry trader, TradeEntry trade, int tradeIndex) {
         if(trader == null || trade == null || trade.TradeType == null) {return null;}
 
         List<ItemStack> itemInputs = new ArrayList<>();
@@ -122,7 +126,7 @@ public class JELTTradeConverter {
                 trade.TradeType,
                 itemInputs, itemOutputs,
                 fluidInputs, fluidOutputs,
-                quantity
+                quantity, tradeIndex
         );
     }
 
@@ -131,9 +135,10 @@ public class JELTTradeConverter {
         if(file == null || file.Traders == null) {return result;}
         for(TraderEntry trader : file.Traders) {
             if(trader == null || trader.Trades == null) {continue;}
-            for(TradeEntry trade : trader.Trades) {
+            for(int tradeIndex = 0; tradeIndex < trader.Trades.size(); tradeIndex++) {
+                TradeEntry trade = trader.Trades.get(tradeIndex);
                 try {
-                    JELTTrade converted = convert(trader, trade);
+                    JELTTrade converted = convert(trader, trade, tradeIndex);
                     if(converted != null) {result.add(converted);}
                 }
                 catch(Exception e) {

@@ -2,12 +2,15 @@ package com.qinglin.just_enough_lightmans_trades.jei;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.qinglin.just_enough_lightmans_trades.trades.JELTTrade;
+import com.qinglin.just_enough_lightmans_trades.trades.TradeManager;
+import io.github.lightman314.lightmanscurrency.api.money.coins.CoinAPI;
 import io.github.lightman314.lightmanscurrency.common.core.ModItems;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.gui.ingredient.IRecipeSlotDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -19,11 +22,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
+import java.util.List;
+
 public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
 
     private final IDrawable icon;
 
     private final IDrawableStatic arrow;
+    private final int priceSlotCount;
 
     public JELTRecipeCategory(IGuiHelper guiHelper){
         this.icon = guiHelper.createDrawableIngredient(
@@ -32,6 +38,15 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
         );
 
         this.arrow = guiHelper.getRecipeArrow();
+        // Reserve room for change, even when the base price is a single denomination.
+        int slots = 6;
+        for(JELTTrade recipe : TradeManager.getTrades()) {
+            if(!"BARTER".equals(recipe.getTradeType()))
+                slots = Math.max(slots, LiveTradePrice.getBasePrice(recipe).size());
+        }
+        for(var chain : CoinAPI.getApi().AllChainData())
+            slots = Math.max(slots, chain.getCoreChain().size());
+        this.priceSlotCount = slots;
     }
 
     @Override
@@ -50,12 +65,14 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
     public int getWidth() {return 150;}
 
     @Override
-    public int getHeight() {return 60;}
+    public int getHeight() {return Math.max(60, 24 + ((priceSlotCount + 2) / 3) * 18);}
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder,JELTTrade recipe,IFocusGroup focuses) {
         final int lx=4,rx=90,sy=24;int idx=0;
-        for(ItemStack stack:recipe.getItemInputs()){
+        if("SALE".equals(recipe.getTradeType())) {
+            addPriceSlots(builder, recipe, RecipeIngredientRole.INPUT, lx, sy);
+        } else for(ItemStack stack:recipe.getItemInputs()){
             int x=lx+(idx%3)*18,y=sy+(idx/3)*18;
             builder.addSlot(RecipeIngredientRole.INPUT,x,y).addItemStack(stack);
             idx++;
@@ -67,7 +84,9 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
             idx++;
         }
         idx=0;
-        for(ItemStack stack:recipe.getItemOutputs()){
+        if("PURCHASE".equals(recipe.getTradeType())) {
+            addPriceSlots(builder, recipe, RecipeIngredientRole.OUTPUT, rx, sy);
+        } else for(ItemStack stack:recipe.getItemOutputs()){
             int x=rx+(idx%3)*18,y=sy+(idx/3)*18;
             builder.addSlot(RecipeIngredientRole.OUTPUT,x,y).addItemStack(stack);
             idx++;
@@ -77,6 +96,34 @@ public class JELTRecipeCategory implements IRecipeCategory<JELTTrade> {
             builder.addSlot(RecipeIngredientRole.OUTPUT,x,y)
                     .addFluidStack(fluid.getFluid(),fluid.getAmount(),fluid.getTag());
             idx++;
+        }
+    }
+
+    private void addPriceSlots(IRecipeLayoutBuilder builder, JELTTrade recipe,
+                              RecipeIngredientRole role, int x, int y) {
+        List<ItemStack> basePrice = LiveTradePrice.getBasePrice(recipe);
+        for(int i = 0; i < priceSlotCount; i++) {
+            var slot = builder.addSlot(role, x + (i % 3) * 18, y + (i / 3) * 18)
+                    .setSlotName("price_" + i);
+            if(i < basePrice.size())
+                slot.addItemStack(basePrice.get(i));
+        }
+    }
+
+    @Override
+    public void onDisplayedIngredientsUpdate(JELTTrade recipe, List<IRecipeSlotDrawable> slots,
+                                             IFocusGroup focuses) {
+        if("BARTER".equals(recipe.getTradeType()))
+            return;
+        List<ItemStack> price = LiveTradePrice.getPrice(recipe);
+        for(IRecipeSlotDrawable slot : slots) {
+            String name = slot.getSlotName().orElse("");
+            if(!name.startsWith("price_"))
+                continue;
+            int index = Integer.parseInt(name.substring(6));
+            // Empty overrides clear denominations that disappeared after another fluctuation.
+            slot.createDisplayOverrides().addItemStacks(index < price.size()
+                    ? List.of(price.get(index)) : List.of());
         }
     }
 
